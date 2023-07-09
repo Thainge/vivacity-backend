@@ -12,8 +12,8 @@ const pool = new Pool({
 
 export interface Applicant {
     id: Number;
-    firstName: String;
-    lastName: String;
+    firstname: String;
+    lastname: String;
     about: String;
     address: String;
     state: String;
@@ -21,27 +21,16 @@ export interface Applicant {
     zip: String;
 }
 
-// Get All Applicant
-const getAllApplicants = async (req: Request, res: Response) => {
-    // get all Applicants
-    pool.query(`SELECT * FROM Applicants;`, (error: any, results: { rows: any; }) => {
-        if (error) {
-            throw error;
-        }
-        return res.status(StatusCodes.OK).json(results.rows)
-    });
-};
-
 // Get Applicant data
 const getApplicant = async (req: Request, res: Response) => {
     // get the Applicant id from the req
     let id: string = req.params.id;
-
     // get the Applicant
     pool.query('SELECT * FROM Applicants WHERE id = $1;', [id], (error: any, results: { rows: any; }) => {
         if (error) {
             throw error;
         }
+        console.log(results.rows[0])
         return res.status(StatusCodes.OK).json(results.rows[0])
     });
 };
@@ -50,14 +39,32 @@ const getApplicant = async (req: Request, res: Response) => {
 const CreateApplicant = async (req: Request, res: Response) => {
     // get the data from req.body
     let body: Applicant = req.body ?? null;
-    const { firstName, lastName, about, address, city, state, zip } = body;
+    const { id, firstname, lastname, about, address, city, state, zip } = body;
 
-    // add the Applicant
-    pool.query('INSERT INTO Applicants (firstname, lastname, about, address, state, city, zip) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [firstName, lastName, about, address, city, state, zip], (error: any, results: any) => {
+    // Since only 1 applicant for this example, check if an applicant exists
+    await pool.query('SELECT * FROM Applicants WHERE id = $1;', [id], (error: any, results: { rows: any; }) => {
         if (error) {
-            throw error
+            throw error;
         }
-        res.status(StatusCodes.CREATED).send(`Applicant added with ID: ${results.rows[0].id}`)
+
+        // Applicant exists? Then update
+        if (results.rows.length > 0) {
+            // update the Applicant
+            pool.query('UPDATE Applicants SET firstname = $1, lastname = $2, about = $3, address = $4, city = $5, state = $6, zip = $7 WHERE id = $8', [firstname, lastname, about, address, city, state, zip, id], (error: any, results: any) => {
+                if (error) {
+                    throw error
+                }
+                return res.status(StatusCodes.OK).send(`Applicant modified with ID: ${id}`)
+            });
+        } else {
+            // Else add to the Applicant
+            pool.query('INSERT INTO Applicants (id, firstname, lastname, about, address, city, state, zip) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [id, firstname, lastname, about, address, city, state, zip], (error: any, results: any) => {
+                if (error) {
+                    throw error
+                }
+                return res.status(StatusCodes.CREATED).send(`Applicant added with ID: ${results.rows[0].id}`)
+            });
+        }
     });
 };
 
@@ -65,14 +72,33 @@ const CreateApplicant = async (req: Request, res: Response) => {
 const UpdateApplicant = async (req: Request, res: Response) => {
     // // get the data from req.body
     let body: Applicant = req.body ?? null;
-    const { id, firstName, lastName, about, address, city, state, zip } = body;
+    const { id, firstname, lastname, about, address, city, state, zip } = body;
 
-    // update the Applicant
-    pool.query('UPDATE Applicants SET firstname = $1, lastname = $2, about = $3, address = $4, state = $5, city = $6, zip = $7 WHERE id = $8', [firstName, lastName, about, address, city, state, zip, id], (error: any, results: any) => {
+    // Since only 1 applicant for this example, check if an applicant exists
+    await pool.query('SELECT * FROM Applicants WHERE id = $1;', [id], (error: any, results: { rows: any; }) => {
         if (error) {
-            throw error
+            throw error;
         }
-        res.status(StatusCodes.OK).send(`Applicant modified with ID: ${id}`)
+
+        // Applicant exists? Then update
+        if (results.rows.length > 0) {
+            console.log(results.rows);
+            // update the Applicant
+            pool.query('UPDATE Applicants SET firstname = $1, lastname = $2, about = $3, address = $4, city = $5, state = $6, zip = $7 WHERE id = $8', [firstname, lastname, about, address, city, state, zip, id], (error: any, results: any) => {
+                if (error) {
+                    throw error
+                }
+                return res.status(StatusCodes.OK).send(`Applicant modified with ID: ${id}`)
+            });
+        } else {
+            // Else add to the Applicant
+            pool.query('INSERT INTO Applicants (id, firstname, lastname, about, address, city, state, zip) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [id, firstname, lastname, about, address, city, state, zip], (error: any, results: any) => {
+                if (error) {
+                    throw error
+                }
+                return res.status(StatusCodes.CREATED).send(`Applicant added with ID: ${results.rows[0].id}`)
+            });
+        }
     });
 };
 
@@ -90,4 +116,4 @@ const DeleteApplicant = async (req: Request, res: Response, next: NextFunction) 
     })
 };
 
-export default { getApplicant, UpdateApplicant, DeleteApplicant, CreateApplicant, getAllApplicants };
+export default { getApplicant, UpdateApplicant, DeleteApplicant, CreateApplicant };
