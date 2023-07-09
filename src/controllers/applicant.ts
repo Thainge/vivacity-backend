@@ -30,7 +30,7 @@ const getApplicant = async (req: Request, res: Response) => {
         if (error) {
             return res.status(StatusCodes.BAD_REQUEST).send(`Error finding user with id of ${id}: ` + error);
         }
-        return res.status(StatusCodes.OK).json(results.rows[0])
+        return res.status(StatusCodes.OK).json(results.rows[0]);
     });
 };
 
@@ -53,7 +53,7 @@ const CreateApplicant = async (req: Request, res: Response) => {
                 if (error) {
                     return res.status(StatusCodes.BAD_REQUEST).send("Invalid application data: " + error);
                 }
-                return res.status(StatusCodes.OK).send(`Applicant modified with ID: ${id}`)
+                return res.status(StatusCodes.OK).send(body);
             });
         } else {
             // Else add to the Applicant
@@ -61,7 +61,7 @@ const CreateApplicant = async (req: Request, res: Response) => {
                 if (error) {
                     return res.status(StatusCodes.BAD_REQUEST).send("Invalid application data: " + error);
                 }
-                return res.status(StatusCodes.CREATED).send(`Applicant added with ID: ${results.rows[0].id}`)
+                return res.status(StatusCodes.CREATED).send(body);
             });
         }
     });
@@ -86,7 +86,7 @@ const UpdateApplicant = async (req: Request, res: Response) => {
                 if (error) {
                     return res.status(StatusCodes.BAD_REQUEST).send("Invalid application data: " + error);
                 }
-                return res.status(StatusCodes.OK).send(`Applicant modified with ID: ${id}`)
+                return res.status(StatusCodes.OK).send(body);
             });
         } else {
             // Else add to the Applicant
@@ -94,7 +94,7 @@ const UpdateApplicant = async (req: Request, res: Response) => {
                 if (error) {
                     return res.status(StatusCodes.BAD_REQUEST).send("Invalid application data: " + error);
                 }
-                return res.status(StatusCodes.CREATED).send(`Applicant added with ID: ${results.rows[0].id}`)
+                return res.status(StatusCodes.CREATED).send(body);
             });
         }
     });
@@ -110,7 +110,7 @@ const DeleteApplicant = async (req: Request, res: Response, next: NextFunction) 
         if (error) {
             return res.status(StatusCodes.NOT_FOUND).send(`Error deleting user with id of ${id}: ` + error);
         }
-        return res.status(StatusCodes.OK).send(`Applicant deleted with ID: ${id}`)
+        return res.status(StatusCodes.OK).send(id);
     })
 };
 
