@@ -30,6 +30,11 @@ describe("GET /awesome/applicant/:id", () => {
         const response = await request(baseURL).get(`/awesome/applicant/${testApplicant.id}`);
         expect(response.statusCode).toBe(StatusCodes.OK);
     });
+
+    it("should return 400", async () => {
+        const response = await request(baseURL).get(`/awesome/applicant/null`);
+        expect(response.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
 });
 
 describe("POST /awesome/applicant", () => {
@@ -58,6 +63,11 @@ describe("POST /awesome/applicant", () => {
         const response = await request(baseURL).post("/awesome/applicant").send(testApplicant);
         expect(response.statusCode).toBe(StatusCodes.OK);
     });
+
+    it("should return 400", async () => {
+        const response = await request(baseURL).post(`/awesome/applicant`);
+        expect(response.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
 });
 
 describe("PUT /awesome/applicant", () => {
@@ -85,6 +95,11 @@ describe("PUT /awesome/applicant", () => {
         const response = await request(baseURL).put(`/awesome/applicant`).send(testApplicant);
         expect(response.statusCode).toBe(StatusCodes.OK);
     });
+
+    it("should return 400", async () => {
+        const response = await request(baseURL).post(`/awesome/applicant`);
+        expect(response.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
 });
 
 describe("DELETE /awesome/applicant", () => {
@@ -107,5 +122,10 @@ describe("DELETE /awesome/applicant", () => {
     it("should return 200", async () => {
         const response = await request(baseURL).delete(`/awesome/applicant/${testApplicant.id}`);
         expect(response.statusCode).toBe(StatusCodes.OK);
+    });
+
+    it("should return 400", async () => {
+        const response = await request(baseURL).post(`/awesome/applicant/null`);
+        expect(response.statusCode).toBe(StatusCodes.NOT_FOUND);
     });
 });

@@ -28,9 +28,8 @@ const getApplicant = async (req: Request, res: Response) => {
     // get the Applicant
     pool.query('SELECT * FROM Applicants WHERE id = $1;', [id], (error: any, results: { rows: any; }) => {
         if (error) {
-            throw error;
+            return res.status(StatusCodes.BAD_REQUEST).send(`Error finding user with id of ${id}: ` + error);
         }
-        console.log(results.rows[0])
         return res.status(StatusCodes.OK).json(results.rows[0])
     });
 };
@@ -44,7 +43,7 @@ const CreateApplicant = async (req: Request, res: Response) => {
     // Since only 1 applicant for this example, check if an applicant exists
     await pool.query('SELECT * FROM Applicants WHERE id = $1;', [id], (error: any, results: { rows: any; }) => {
         if (error) {
-            throw error;
+            return res.status(StatusCodes.BAD_REQUEST).send(`Error finding user with id of ${id}: ` + error);
         }
 
         // Applicant exists? Then update
@@ -52,7 +51,7 @@ const CreateApplicant = async (req: Request, res: Response) => {
             // update the Applicant
             pool.query('UPDATE Applicants SET firstname = $1, lastname = $2, about = $3, address = $4, city = $5, state = $6, zip = $7 WHERE id = $8', [firstname, lastname, about, address, city, state, zip, id], (error: any, results: any) => {
                 if (error) {
-                    throw error
+                    return res.status(StatusCodes.BAD_REQUEST).send("Invalid application data: " + error);
                 }
                 return res.status(StatusCodes.OK).send(`Applicant modified with ID: ${id}`)
             });
@@ -60,7 +59,7 @@ const CreateApplicant = async (req: Request, res: Response) => {
             // Else add to the Applicant
             pool.query('INSERT INTO Applicants (id, firstname, lastname, about, address, city, state, zip) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [id, firstname, lastname, about, address, city, state, zip], (error: any, results: any) => {
                 if (error) {
-                    throw error
+                    return res.status(StatusCodes.BAD_REQUEST).send("Invalid application data: " + error);
                 }
                 return res.status(StatusCodes.CREATED).send(`Applicant added with ID: ${results.rows[0].id}`)
             });
@@ -77,16 +76,15 @@ const UpdateApplicant = async (req: Request, res: Response) => {
     // Since only 1 applicant for this example, check if an applicant exists
     await pool.query('SELECT * FROM Applicants WHERE id = $1;', [id], (error: any, results: { rows: any; }) => {
         if (error) {
-            throw error;
+            return res.status(StatusCodes.BAD_REQUEST).send(`Error finding user with id of ${id}: ` + error);
         }
 
         // Applicant exists? Then update
         if (results.rows.length > 0) {
-            console.log(results.rows);
             // update the Applicant
             pool.query('UPDATE Applicants SET firstname = $1, lastname = $2, about = $3, address = $4, city = $5, state = $6, zip = $7 WHERE id = $8', [firstname, lastname, about, address, city, state, zip, id], (error: any, results: any) => {
                 if (error) {
-                    throw error
+                    return res.status(StatusCodes.BAD_REQUEST).send("Invalid application data: " + error);
                 }
                 return res.status(StatusCodes.OK).send(`Applicant modified with ID: ${id}`)
             });
@@ -94,7 +92,7 @@ const UpdateApplicant = async (req: Request, res: Response) => {
             // Else add to the Applicant
             pool.query('INSERT INTO Applicants (id, firstname, lastname, about, address, city, state, zip) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [id, firstname, lastname, about, address, city, state, zip], (error: any, results: any) => {
                 if (error) {
-                    throw error
+                    return res.status(StatusCodes.BAD_REQUEST).send("Invalid application data: " + error);
                 }
                 return res.status(StatusCodes.CREATED).send(`Applicant added with ID: ${results.rows[0].id}`)
             });
@@ -110,9 +108,9 @@ const DeleteApplicant = async (req: Request, res: Response, next: NextFunction) 
     // delete the Applicant
     pool.query('DELETE FROM Applicants WHERE id = $1', [id], (error: any, results: any) => {
         if (error) {
-            throw error
+            return res.status(StatusCodes.NOT_FOUND).send(`Error deleting user with id of ${id}: ` + error);
         }
-        res.status(StatusCodes.OK).send(`Applicant deleted with ID: ${id}`)
+        return res.status(StatusCodes.OK).send(`Applicant deleted with ID: ${id}`)
     })
 };
 
